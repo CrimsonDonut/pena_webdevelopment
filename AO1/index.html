@@ -3,62 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="stylesheet.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.svg" type="image/x-icon">
     <title>Peña Bento Layout</title>
       <style>
-    .card {
-        color: rgb(255, 7, 110);
-        background-color: #1e1e1e;
-      min-height: 180px;
-      /* background-color: grey; */
-    }
+
   </style>
 </head>
-<body style="background-color: #161616; color: rgb(255, 7, 110);">
-  <div class="container">
+<body class="app d-flex flex-column" style="background-color: #161616; color: rgb(255, 7, 61);">
+ 
+  <div class="container-fluid px-4 flex-shrink-0">
     <div class="row">
       <div class="col">
         <div class="h2 text-left m-3">T O N F I T</div>
       </div>
     </div>
   </div>
-  <div class="container mb-5">
-    <div class="row">
-      <div class="col-8">
-        <div class="row">
+  
+  <main class="container-fluid px-4 mb-3 flex-grow-1 d-flex flex-column fit">
+    <div class="row flex-grow-1 fit">
+      <div class="col-8 d-flex flex-column fit">
+        <div class="row r-top fit">
+ 
+          <!-- PROFILE -->
           <div class="col-4 p-1">
-            <div class="card p-1 h-100">profile</div>
-          </div>
-          <div class="col-8 d-flex flex-column">
-            <div class="row">
-              <div class="col-12 p-1">
-                <div class="card p-1 h-100">weekly volume</div>
+            <div class="card p-1 h-100">
+              <div class="card-body">
+                <div>
+                  <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar d-flex align-items-center justify-content-center fw-bold text-white rounded-3 border border-secondary border-opacity-25">RN</div>
+                    <div>
+                      <div class="fw-bold text-white">Carl Anthony Peña</div>
+                      <div class="small sub mono">5 day streak</div>
+                    </div>
+                  </div>
+ 
+                  <div class="d-flex justify-content-between align-items-baseline py-2 row-line">
+                    <span class="small sub">Weight</span>
+                    <span class="num fs-6 fw-medium">142.8 <span class="unit">lbs</span></span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-baseline py-2 row-line">
+                    <span class="small sub">Streak</span>
+                    <span class="mono fs-6 pink">5 days</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-baseline py-2 row-line">
+                    <span class="small sub">Target</span>
+                    <span class="small text-white fw-medium">Strength &amp; Hypertrophy</span>
+                  </div>
+                </div>
+ 
+                <div>
+                  <div class="d-flex justify-content-between small mono sub mb-2">
+                    <span>Weekly Goal</span>
+                    <span class="text-white fw-medium">85%</span>
+                  </div>
+                  <div class="progress"><div class="progress-bar" style="width: 85%"></div></div>
+                </div>
               </div>
             </div>
-            <div class="row flex-grow-1">
-              <div class="col-6 p-1">
-                <div class="card p-1 h-100">personal records</div>
+          </div>
+ 
+          <div class="col-8 d-flex flex-column fit">
+            <div class="row">
+              <!-- WEEKLY VOLUME -->
+              <div class="col-12 p-1">
+                <div class="card p-1 h-100">
+                  <div class="card-body flex-row flex-nowrap align-items-end justify-content-between">
+                    <div>
+                      <div class="label">Weekly Volume</div>
+                      <div class="num fs-2 mt-1">40,000<span class="unit">lbs</span></div>
+                    </div>
+                    <div class="vol">
+                      <div><div class="bar" style="height:72%"></div><span>Push</span></div>
+                      <div><div class="bar" style="height:86%"></div><span>Pull</span></div>
+                      <div><div class="bar" style="height:94%"></div><span>Legs</span></div>
+                      <div><div class="bar mid" style="height:10%"></div><span>Rest</span></div>
+                      <div><div class="bar" style="height:90%"></div><span>Upper</span></div>
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
+            <div class="row flex-grow-1 fit">
+              <!-- PERSONAL RECORDS -->
               <div class="col-6 p-1">
-                <div class="card p-1 h-100">recovery</div>
+                <div class="card p-1 h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="label">Personal Bests</span>
+                      <span class="small mono text-white-50">1RM</span>
+                    </div>
+ 
+                    <div class="d-flex flex-column gap-3">
+                      <div>
+                        <div class="d-flex justify-content-between small mb-1">
+                          <span class="text-white-50">Bench Press</span>
+                          <span class="num fw-medium">230 <span class="unit micro">lbs</span></span>
+                        </div>
+                        <div class="progress"><div class="progress-bar" style="width: 78%"></div></div>
+                      </div>
+                      <div>
+                        <div class="d-flex justify-content-between small mb-1">
+                          <span class="text-white-50">Back Squat</span>
+                          <span class="num fw-medium">265 <span class="unit micro">lbs</span></span>
+                        </div>
+                        <div class="progress"><div class="progress-bar" style="width: 88%"></div></div>
+                      </div>
+                      <div>
+                        <div class="d-flex justify-content-between small mb-1">
+                          <span class="text-white-50">Pulldowns</span>
+                          <span class="num fw-medium">225 <span class="unit micro">lbs</span></span>
+                        </div>
+                        <div class="progress"><div class="progress-bar" style="width: 75%"></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+ 
+              <!-- RECOVERY -->
+              <div class="col-6 p-1">
+                <div class="card p-1 h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="label">Bio Vitals</span>
+                      <span class="small mono text-white-50">Today</span>
+                    </div>
+ 
+                    <div class="row text-center g-2 my-auto">
+                      <div class="col-4">
+                        <span class="small sub d-block mb-1">Sleep</span>
+                        <span class="num fs-4">88<span class="unit">%</span></span>
+                      </div>
+                      <div class="col-4">
+                        <span class="small sub d-block mb-1">Protein</span>
+                        <span class="num fs-4">140<span class="unit">g</span></span>
+                      </div>
+                      <div class="col-4">
+                        <span class="small sub d-block mb-1">Hydration</span>
+                        <span class="num fs-4">3.2<span class="unit">L</span></span>
+                      </div>
+                    </div>
+ 
+                    <div class="d-flex justify-content-between small mono sub pt-3 border-top" style="border-color: var(--line) !important;">
+                      <span>Rest Readiness</span>
+                      <span class="text-white fw-medium">9.4 / 10</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="row">
+ 
+        <div class="row r-bot fit">
+          <!-- CONSISTENCY MATRIX -->
           <div class="col-8 p-1">
-            <div class="card p-1">Consistency Matrix</div>
+            <div class="card p-1 h-100">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="label">Consistency Matrix</div>
+                  <div class="small mono pink">80.0% Adherence</div>
+                </div>
+ 
+                <div class="hm-box">
+                  <div class="hm-body">
+                    <div class="hm-days">
+                      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                    </div>
+                    <div class="hm-calendar">
+                      <div class="hm-month-block">
+                        <div class="hm-month">Jul</div>
+                        <div class="hm-grid">
+          <i class="hm off"></i>
+          <i class="hm off"></i>
+          <i class="hm l0" title="Jul 1"></i>
+          <i class="hm l1" title="Jul 2"></i>
+          <i class="hm l2" title="Jul 3"></i>
+          <i class="hm l3" title="Jul 4"></i>
+          <i class="hm l4" title="Jul 5"></i>
+          <i class="hm l2" title="Jul 6"></i>
+          <i class="hm l0" title="Jul 7"></i>
+          <i class="hm l1" title="Jul 8"></i>
+          <i class="hm l2" title="Jul 9"></i>
+          <i class="hm l4" title="Jul 10"></i>
+          <i class="hm l4" title="Jul 11"></i>
+          <i class="hm l3" title="Jul 12"></i>
+          <i class="hm l1" title="Jul 13"></i>
+          <i class="hm l0" title="Jul 14"></i>
+          <i class="hm l2" title="Jul 15"></i>
+          <i class="hm l3" title="Jul 16"></i>
+          <i class="hm l4" title="Jul 17"></i>
+          <i class="hm l0" title="Jul 18"></i>
+          <i class="hm l2" title="Jul 19"></i>
+          <i class="hm l4" title="Jul 20"></i>
+          <i class="hm l1" title="Jul 21"></i>
+          <i class="hm l0" title="Jul 22"></i>
+          <i class="hm l2" title="Jul 23"></i>
+          <i class="hm l4" title="Jul 24"></i>
+          <i class="hm l3" title="Jul 25"></i>
+          <i class="hm l4" title="Jul 26"></i>
+          <i class="hm l2" title="Jul 27"></i>
+          <i class="hm l0" title="Jul 28"></i>
+          <i class="hm l1" title="Jul 29"></i>
+          <i class="hm l4" title="Jul 30"></i>
+          <i class="hm l1" title="Jul 31"></i>
+          <i class="hm off"></i>
+          <i class="hm off"></i>
+                        </div>
+                      </div>
+                      <div class="hm-month-block">
+                        <div class="hm-month">Aug</div>
+                        <div class="hm-grid">
+                          <i class="hm off"></i><i class="hm off"></i><i class="hm off"></i>
+                          <i class="hm off"></i><i class="hm off"></i>
+                          <i class="hm l2" title="Aug 1"></i><i class="hm l3" title="Aug 2"></i><i class="hm l1" title="Aug 3"></i><i class="hm l0" title="Aug 4"></i><i class="hm l2" title="Aug 5"></i><i class="hm l4" title="Aug 6"></i><i class="hm l1" title="Aug 7"></i>
+                          <i class="hm l0" title="Aug 8"></i><i class="hm l3" title="Aug 9"></i><i class="hm l2" title="Aug 10"></i><i class="hm l1" title="Aug 11"></i><i class="hm l4" title="Aug 12"></i><i class="hm l0" title="Aug 13"></i><i class="hm l2" title="Aug 14"></i>
+                          <i class="hm l3" title="Aug 15"></i><i class="hm l1" title="Aug 16"></i><i class="hm l4" title="Aug 17"></i><i class="hm l0" title="Aug 18"></i><i class="hm l2" title="Aug 19"></i><i class="hm l3" title="Aug 20"></i><i class="hm l4" title="Aug 21"></i>
+                          <i class="hm l1" title="Aug 22"></i><i class="hm l0" title="Aug 23"></i><i class="hm l2" title="Aug 24"></i><i class="hm l3" title="Aug 25"></i><i class="hm l4" title="Aug 26"></i><i class="hm l1" title="Aug 27"></i><i class="hm l2" title="Aug 28"></i>
+                          <i class="hm l0" title="Aug 29"></i><i class="hm l3" title="Aug 30"></i><i class="hm l1" title="Aug 31"></i>
+                        </div>
+                      </div>
+                      <div class="hm-month-block">
+                        <div class="hm-month">Sep</div>
+                        <div class="hm-grid">
+                          <i class="hm off"></i>
+                          <i class="hm l1" title="Sep 1"></i><i class="hm l3" title="Sep 2"></i><i class="hm l0" title="Sep 3"></i><i class="hm l2" title="Sep 4"></i><i class="hm l4" title="Sep 5"></i><i class="hm l1" title="Sep 6"></i><i class="hm l0" title="Sep 7"></i>
+                          <i class="hm l2" title="Sep 8"></i><i class="hm l3" title="Sep 9"></i><i class="hm l1" title="Sep 10"></i><i class="hm l4" title="Sep 11"></i><i class="hm l0" title="Sep 12"></i><i class="hm l2" title="Sep 13"></i><i class="hm l3" title="Sep 14"></i>
+                          <i class="hm l4" title="Sep 15"></i><i class="hm l1" title="Sep 16"></i><i class="hm l0" title="Sep 17"></i><i class="hm l2" title="Sep 18"></i><i class="hm l3" title="Sep 19"></i><i class="hm l4" title="Sep 20"></i><i class="hm l1" title="Sep 21"></i>
+                          <i class="hm l2" title="Sep 22"></i><i class="hm l0" title="Sep 23"></i><i class="hm l3" title="Sep 24"></i><i class="hm l1" title="Sep 25"></i><i class="hm l4" title="Sep 26"></i><i class="hm l2" title="Sep 27"></i><i class="hm l0" title="Sep 28"></i>
+                          <i class="hm l3" title="Sep 29"></i><i class="hm l2" title="Sep 30"></i>
+                          <i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i>
+                        </div>
+                      </div>
+                      <div class="hm-month-block">
+                        <div class="hm-month">Oct</div>
+                        <div class="hm-grid">
+                          <i class="hm off"></i><i class="hm off"></i><i class="hm off"></i>
+                          <i class="hm l2" title="Oct 1"></i><i class="hm l4" title="Oct 2"></i><i class="hm l1" title="Oct 3"></i><i class="hm l0" title="Oct 4"></i><i class="hm l3" title="Oct 5"></i><i class="hm l2" title="Oct 6"></i><i class="hm l1" title="Oct 7"></i>
+                          <i class="hm l4" title="Oct 8"></i><i class="hm l0" title="Oct 9"></i><i class="hm l2" title="Oct 10"></i><i class="hm l3" title="Oct 11"></i><i class="hm l1" title="Oct 12"></i>
+                          <i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i>
+                          <i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i>
+                          <i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i><i class="hm off"></i>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="hm-side">
+                      <div class="text-end">
+                        <div class="num fs-2">12<span class="unit"> / 30 days</span></div>
+                        <div class="small mono sub">active in Sep</div>
+                      </div>
+                      <div class="hm-legend">
+                        <span>Less</span>
+                        <i class="hm l0"></i><i class="hm l1"></i><i class="hm l2"></i><i class="hm l3"></i><i class="hm l4"></i>
+                        <span>More</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+ 
+          <!-- CURRENT SESSION -->
           <div class="col-4 p-1">
-            <div class="card p-1">Current session</div>
+            <div class="card p-1 h-100">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="label">Last Logged Exercise</span>
+                  <span class="small mono pink">Set 4 / 5</span>
+                </div>
+ 
+                <div>
+                  <div class="fw-semibold text-white">Machine Shoulder Press</div>
+                  <div class="num fs-2 mt-1">225 <span class="unit">lbs</span></div>
+                </div>
+ 
+                <button type="button" class="btn btn-pink w-100">Complete Set</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-4 p-1 d-flex flex-column gap-2">
-        <div class="card p-1">spotify</div>
-        <div class="card p-1 flex-grow-1">Daily Protocols</div>
+ 
+      <div class="col-4 p-1 d-flex flex-column gap-2 fit">
+        <!-- SPOTIFY -->
+        <div class="card p-1">
+          <div class="card-body">
+            <div class="d-flex justify-content-between label">
+              <span>Now Playing</span>
+              <span class="text-white-50">Spotify</span>
+            </div>
+ 
+            <div class="d-flex align-items-center gap-3">
+              <!-- Album art -->
+              <img class="cover" src="images/cover.jpg" alt="Album cover">
+              <div class="flex-grow-1" style="min-width:0">
+                <div class="fw-semibold text-white text-truncate">Shuloks</div>
+                <div class="small sub text-truncate">RAPROJECT SIX</div>
+              </div>
+              <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                <button type="button" class="ctrl" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                <button type="button" class="ctrl play" aria-label="Play / Pause"><svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                <button type="button" class="ctrl" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+              </div>
+            </div>
+ 
+            <div>
+              <div class="progress"><div class="progress-bar" style="width: 64%"></div></div>
+              <div class="d-flex justify-content-between mono sub micro mt-1">
+                <span>2:18</span>
+                <span>3:34</span>
+              </div>
+            </div>
+          </div>
+        </div>
+ 
+        <!-- DAILY PROTOCOLS -->
+        <div class="card p-1 flex-grow-1 fit">
+          <div class="card-body">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="label">Daily Protocols</span>
+                <span id="protocol-count" class="small mono pink">3 / 4</span>
+              </div>
+              <ul class="list-unstyled m-0">
+                <li>
+                  <label class="protocol-row d-flex justify-content-between align-items-center py-2 row-line mb-0">
+                  <span class="small text-white fw-medium">Creatine</span>
+                    <input class="protocol-checkbox" type="checkbox" checked>
+                  </label>
+                </li>
+                <li>
+                  <label class="protocol-row d-flex justify-content-between align-items-center py-2 row-line mb-0">
+                  <span class="small text-white fw-medium">Electrolytes</span>
+                    <input class="protocol-checkbox" type="checkbox" checked>
+                  </label>
+                </li>
+                <li>
+                  <label class="protocol-row d-flex justify-content-between align-items-center py-2 row-line mb-0">
+                  <span class="small text-white fw-medium">Mobility Drill</span>
+                    <input class="protocol-checkbox" type="checkbox" checked>
+                  </label>
+                </li>
+                <li>
+                  <label class="protocol-row d-flex justify-content-between align-items-center py-2 row-line mb-0">
+                    <span class="small text-white-50">Cold Plunge / Sauna</span>
+                    <input class="protocol-checkbox" type="checkbox">
+                  </label>
+                </li>
+                <li>
+                  <label class="protocol-row d-flex justify-content-between align-items-center py-2 row-line mb-0">
+                    <span class="small text-white-50">Protein Shake</span>
+                    <input class="protocol-checkbox" type="checkbox">
+                  </label>
+                </li>
+              </ul>
+            </div>
+ 
+            <div class="text-center mono small sub pt-3">
+              <span class="pink">92%</span> adherence this week
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
+  <script>
+    const protocolCheckboxes = document.querySelectorAll(".protocol-checkbox");
+    const protocolCount = document.querySelector("#protocol-count");
+
+    const updateProtocolCount = () => {
+      const completed = document.querySelectorAll(".protocol-checkbox:checked").length;
+      protocolCount.textContent = `${completed} / ${protocolCheckboxes.length}`;
+    };
+
+    protocolCheckboxes.forEach((checkbox) => checkbox.addEventListener("change", updateProtocolCount));
+  </script>
+</body>
 </html>
+ 
