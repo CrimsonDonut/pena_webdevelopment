@@ -6,39 +6,66 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
     <link href="" rel="icon">
     <title>Document</title>
+    <style>
+        body {
+            background-color: #f4f6f8;
+        }
+
+        .character-card {
+            max-width: 620px;
+            border-radius: 1.25rem;
+        }
+
+        .character-image {
+            width: 120px;
+            height: 120px;
+            object-fit: 100%;
+            background-color: #eef2f6;
+        }
+
+        #description {
+            line-height: 1.7;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card shadow rounded-5 p-5 text-center">
-                        <div class="mx-auto rounded-circle" style="background-color:aliceblue; width: 100px; height: 100px;">
-                            <img src="" id="image" style="width: 100%;" alt="">
-                        </div>
-                        <div id="description" style="color: aliceblue;">Character Description</div>
-                        <div id="name" style="color: aliceblue;">Character Name</div>
-                    </div>
-                </div>
+    <main class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
+        <div class="card character-card border-0 shadow-sm p-4 p-md-5 text-center">
+            <form id="search-form" class="input-group mb-4">
+                <input type="text" id="character-name" class="form-control" placeholder="Enter a character name" aria-label="Character name">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+            <div class="mb-4">
+                <img src="" id="image" class="character-image rounded-circle" alt="Character portrait">
             </div>
+            <h1 id="name" class="h2 mb-3 text-dark">Character Name</h1>
+            <p id="description" class="mb-0 text-secondary">Character Description</p>
         </div>
-    </div>
+    </main>
     
 </body>
 <script>
     var elName = document.getElementById('name');
     var elImage = document.getElementById('image');
     var elDescription = document.getElementById('description');
+    var inInput = document.getElementById('character-name');
+    var searchForm = document.getElementById('search-form');
 
-    const getDBZ = async () => {
-        const response = await fetch('https://dragonball-api.com/api/characters');
+    const getDBZ = async (name = 'Vegeta') => {
+        const response = await fetch('https://dragonball-api.com/api/characters?name=' + (name));
         const data = await response.json();
-        console.log(data);
-
-        var type = data.name[0].type.name;
-
-        elName.innerHTML = data.name[1].name;
+        const character = data[0];
+        elImage.src = character.image;
+        elDescription.innerHTML = character.description;
+        elName.innerHTML = character.name;
     };
+
+    searchForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        getDBZ(inInput.value.trim());
+    });
+
+    getDBZ();
 
 </script>
 </html>
