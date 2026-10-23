@@ -1,11 +1,225 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLBB JSON CARD</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MLBB JSON CARD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
-    
+<header class="hero text-center px-3 pt-5 pb-5">
+  <div class="py-4">
+    <span class="season-pill d-inline-flex align-items-center gap-2 rounded-pill px-3 py-1 small fw-semibold text-uppercase"><i class="pulse-dot"></i>Land of Dawn · Rank S32 Vanguard</span>
+    <h1 class="hero-title sports-font fw-bold text-white my-3">Fighter Pantheon Roster</h1>
+    <p class="text-secondary mx-auto mb-0" style="max-width:520px">Signature frontline bruisers, crowd control initiators, and duel specialists with master-tier win rates.</p>
+  </div>
+</header>
+
+<div class="countdown-box d-flex flex-wrap justify-content-center align-items-center gap-3 gap-lg-4 rounded-4 px-4 py-3" role="timer" aria-label="Time until ranked season reset">
+  <div class="text-center text-lg-start">
+    <div class="cd-label text-secondary">Mythic Glory Ranked Season Reset</div>
+    <small class="text-danger fw-medium">Pushing for Mythical Immortal</small>
+  </div>
+  <div class="cd-units d-flex align-items-start gap-2">
+    <div class="cd-unit"><span id="cd-days">00</span><small>DAYS</small></div><div class="cd-sep">:</div>
+    <div class="cd-unit"><span id="cd-hours">00</span><small>HRS</small></div><div class="cd-sep">:</div>
+    <div class="cd-unit"><span id="cd-mins">00</span><small>MINS</small></div><div class="cd-sep">:</div>
+    <div class="cd-unit"><span id="cd-secs">00</span><small>SECS</small></div>
+  </div>
+</div>
+
+<main class="container py-5 mt-4"><div id="roster-root"></div></main>
+
+<footer class="border-top border-secondary border-opacity-25 py-4 mt-5 text-center">
+  <span class="badge text-bg-danger sports-font fs-6">Fan made MLBB hub</span>
+  <p class="small text-secondary mt-2 mb-1">A custom enthusiast showcase for Mobile Legends: Bang Bang fighters <strong class="text-light">Martis, Yin, and Chou</strong>.</p>
+  <p class="text-secondary-emphasis mb-0" style="font-size:.7rem">Mobile Legends: Bang Bang and all respective character art, names, and assets are trademarks of Moonton Games.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+const heroData = [
+  {
+    id: "martis", name: "Martis", title: "The Ashura King · Shura's Wrath", mini: "Wild Renegade · Finisher",
+    accent: "#a855f7", on: "#fff", rank: "#01 · CC Immunity & Execute", wr: "73.8% WR · 275 matches", badge: "Expert badge",
+    image: "img/martis.jpg",
+    desc: "Specializes in early-game lane dominance to eliminate rival EXP Laners swiftly, establishing snowball momentum to secure turtle/lord objectives across the map. Features the lowest adaptability tier among the three.",
+    skill: "Decimation (Ult)", spell: "Retribution / Flicker", role: "Jungler / Exp Lane", key: "Hunter Strike",
+    build: { label: "Burst Assasin", title: "Martis Build Path", emblem: "Assassin Emblem", talents: "Rupture / War Cry", tier: "Tier: B (Lowest Tier of the 3)",
+      paths: [{ items: ["Hunter Strike","Dominance Ice","War Axe","Brute Force","Immortality"] }] }
+  },
+  {
+    id: "yin", name: "Yin", title: "Martial Prodigy · Lieh Possessed", mini: "Martial Prodigy · Duelist",
+    accent: "#ff1744", on: "#fff", rank: "#02 · 1v1 Domain Isolation", wr: "64.9% WR · 620+ matches", badge: "Supreme rank",
+    image: "img/yin.jpg",
+    desc: "Specializes in CDR-stacked sustain combat to dismantle high-durability frontline tanks. Leverages a 2-second Skill 1 cooldown within Lieh's 8-second Evil God domain, chained with Petrify for continuous crowd control and lockdown.",
+    skill: "My Turn (Domain)", spell: "Petrify", role: "Exp Lane", key: "Blade of Despair",
+    build: { label: "CDR Sustain Bruiser", title: "Yin Sustain CDR Path", emblem: "Fighter Emblem", talents: "Rupture / War Cry", tier: "Tier: A (Balanced Tier)",
+      paths: [{ items: ["Magic Shoes","War Axe","Hunter Strike","Endless Battle","Sea Halberd","Malefic Roar"] }] }
+  },
+  {
+    id: "chou", name: "Chou", title: "Kung Fu Boy · Master of Jeet Kune Do", mini: "Kung Fu Boy · Playmaker",
+    accent: "#f5b301", on: "#111", rank: "#03 · Supreme Displacement & Roam", wr: "62.4% WR · 729 matches", badge: "All-time main",
+    image: "img/chou.jpg",
+    desc: "The roster's premier adaptable flex pick. Capable of shredding high-HP sustain threats via a Fighter bruiser setup, or instantly eliminating squishy targets through Assassin lethal burst. Maximizes skirmish outplay potential through disciplined multi-dash mobility.",
+    skill: "The Way of Dragon", spell: "Flicker (Essential)", role: "Exp Lane / Tank Roam", key: "Endless Battle",
+    build: { label: "Dual Adaptable Paths", title: "Chou Dual Tactical Paths", emblem: "Fighter / Assassin Dual", talents: "Fighter & Assassin", talentsLabel: "Dual Emblems", tier: "Tier: S+ (Top Adaptability)",
+      paths: [
+        { name: "Path A · Fighter Bruiser", talents: "Rupture / FoB / War Cry", items: ["Tough Boots","War Axe","Endless Battle","Dominance Ice","Brute Force","Immortality"] },
+        { name: "Path B · Assassin Burst", talents: "Thrill / Master Ass. / Lethal", items: ["Rapid Boots","Blade of Heptaseas","Sky Piercer","Blade of Despair","Endless Battle","Immortality"] }
+      ] }
+  }
+];
+
+const root = document.getElementById("roster-root");
+const style = h => `style="--accent:${h.accent};--on:${h.on}"`;
+const stat = (label, value, key) => `<div class="col"><span class="stat-label d-block">${label}</span><b class="small ${key ? "accent-text" : "text-white"}">${value}</b></div>`;
+const head = (title, sub, meta, extra = "") => `
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 border-bottom border-secondary border-opacity-25 pb-2 mb-4">
+    <div><h2 class="sports-font text-white mb-1 ${extra}">${title}</h2><p class="small text-secondary mb-0">${sub}</p></div>
+    <span class="small text-secondary fw-medium">${meta}</span>
+  </div>`;
+
+let html = `<section class="mb-5 pb-4">` + head(
+  `Trinity of Brawl · Primary Mains <span class="badge text-bg-danger align-middle fs-6">CORE ${heroData.length}</span>`,
+  "Select a hero panel to expand combat credentials, key item, and gear set.", "INTERACTIVE ACCORDION VIEW", "display-5") + `
+  <div class="collage has-active d-flex flex-column flex-md-row gap-3" id="gallery-0">`;
+
+for (let i = 0; i < heroData.length; i++) {
+  const h = heroData[i];
+  html += `
+    <div class="panel${i === 0 ? " active" : ""}" data-hero="${h.id}" tabindex="0" role="button" aria-label="Expand ${h.name}" ${style(h)}>
+      <img src="${h.image}" alt="${h.name} - ${h.mini}" loading="lazy">
+      <div class="mini">
+        <h3 class="sports-font fw-bold text-white fs-1 mb-1">${h.name}</h3>
+        <span class="badge accent-bg text-uppercase">${h.mini}</span>
+      </div>
+      <div class="details d-flex flex-column p-3 p-md-4">
+        <button type="button" class="btn-close btn-close-white close-btn" aria-label="Collapse ${h.name}"></button>
+        <div class="badges d-flex flex-wrap gap-2 mb-2">
+          <span class="badge accent-bg text-uppercase">${h.rank}</span>
+          <span class="badge text-bg-dark border border-secondary fw-normal">${h.wr}</span>
+          <span class="badge gold-badge text-uppercase">${h.badge}</span>
+        </div>
+        <h3 class="sports-font fw-bold text-white mb-0">${h.name}</h3>
+        <h5 class="accent-text small text-uppercase fw-semibold mb-3">${h.title}</h5>
+        <p class="desc small text-light-emphasis mb-3">${h.desc}</p>
+        <div class="stats-box rounded-3 p-3"><div class="row row-cols-2 row-cols-sm-4 g-3">
+          ${stat("Signature skill", h.skill)}${stat("Battle spell", h.spell)}${stat("Role", h.role)}${stat("Key item", h.key, true)}
+        </div></div>
+      </div>
+    </div>`;
+}
+html += `</div></section>
+  <section>` + head("Equipment Cores &amp; Tactical Profiles", "Item paths, emblem talent trees, and matchup priorities for each main.", "PATCH 1.8.78", "fs-1") + `
+    <div class="row row-cols-1 row-cols-lg-3 g-4">`;
+
+for (let c = 0; c < heroData.length; c++) {
+  const h = heroData[c], b = h.build;
+  html += `
+      <div class="col">
+        <article class="card card-hero h-100" data-hero="${h.id}" ${style(h)}>
+          <div class="thumb" title="Open ${h.name} panel">
+            <img src="${h.image}" alt="${h.name} build" loading="lazy">
+            <span class="badge accent-bg text-uppercase position-absolute top-0 end-0 m-3">${b.label}</span>
+          </div>
+          <div class="card-body d-flex flex-column pt-0">
+            <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-2">
+              <h4 class="sports-font fw-bold text-white fs-2 mb-0">${b.title}</h4>
+              <small class="accent-text fw-semibold">${b.emblem}</small>
+            </div>
+            <p class="small text-secondary mb-3">${h.desc.split(". Features")[0].split(". Maximizes")[0]}.</p>`;
+  for (let p = 0; p < b.paths.length; p++) {
+    const path = b.paths[p];
+    html += `
+            <div class="path-box rounded-3 p-2 mb-2">
+              ${path.name ? `<div class="d-flex flex-wrap justify-content-between gap-2 mb-2 small"><b class="accent-text text-uppercase">${path.name}</b><span class="text-secondary">${path.talents}</span></div>` : ""}
+              <ul class="list-unstyled d-flex flex-wrap gap-1 mb-0">${path.items.map(it => `<li class="badge item-chip">${it}</li>`).join("")}</ul>
+            </div>`;
+  }
+  html += `
+            <div class="d-flex justify-content-between gap-2 border-top border-secondary border-opacity-25 pt-3 mt-auto small text-secondary">
+              <span>${b.talentsLabel || "Talents"}: <strong class="text-light">${b.talents}</strong></span>
+              <span class="accent-text fw-bold text-end">${b.tier}</span>
+            </div>
+          </div>
+        </article>
+      </div>`;
+}
+html += `</div></section>`;
+root.innerHTML = html;
+
+/* Accordion logic: delegated click handling (same flow as the Slam Dunk roster) */
+function setActive(panel) {
+  const container = panel.closest(".collage");
+  const current = container.querySelector(".panel.active");
+  if (current) current.classList.remove("active");
+  panel.classList.add("active");
+  container.classList.add("has-active");
+}
+function closePanel(panel) {
+  const container = panel.closest(".collage");
+  panel.classList.remove("active");
+  container.classList.remove("has-active");
+}
+
+document.addEventListener("click", (e) => {
+  const closeBtn = e.target.closest(".close-btn");
+  const panel = e.target.closest(".panel");
+
+  if (closeBtn) {
+    e.stopPropagation();
+    const activePanel = closeBtn.closest(".panel.active");
+    if (activePanel) closePanel(activePanel);
+    return;
+  }
+  if (panel) {
+    if (panel.classList.contains("active")) return;
+    setActive(panel);
+    return;
+  }
+  /* build card thumbnail jumps to its hero panel */
+  const thumb = e.target.closest(".card .thumb");
+  if (thumb) {
+    const target = document.querySelector(`.panel[data-hero="${thumb.closest(".card").dataset.hero}"]`);
+    if (target) {
+      setActive(target);
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  const panel = e.target.closest && e.target.closest(".panel");
+  if (e.key === "Escape") {
+    const open = document.querySelector(".panel.active");
+    if (open) closePanel(open);
+  } else if (panel && e.target === panel && (e.key === "Enter" || e.key === " ")) {
+    e.preventDefault();
+    if (!panel.classList.contains("active")) setActive(panel);
+  }
+});
+
+function startSeasonCountdown() {
+  const pad = n => String(n).padStart(2, "0");
+  function updateTimer() {
+    const now = new Date();
+    let target = new Date(now.getFullYear(), now.getMonth(), 15);
+    if (now >= target) target = new Date(now.getFullYear(), now.getMonth() + 1, 15);
+    const diff = target - now;
+    document.getElementById("cd-days").textContent = pad(Math.floor(diff / 864e5));
+    document.getElementById("cd-hours").textContent = pad(Math.floor(diff / 36e5) % 24);
+    document.getElementById("cd-mins").textContent = pad(Math.floor(diff / 6e4) % 60);
+    document.getElementById("cd-secs").textContent = pad(Math.floor(diff / 1e3) % 60);
+  }
+  updateTimer();
+  setInterval(updateTimer, 1000);
+}
+startSeasonCountdown();
+</script>
 </body>
 </html>
