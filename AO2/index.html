@@ -210,6 +210,7 @@ function startSeasonCountdown() {
     const now = new Date();
     let target = new Date(now.getFullYear(), now.getMonth(), 15);
     if (now >= target) target = new Date(now.getFullYear(), now.getMonth() + 1, 15);
+    target.setDate(target.getDate() + 31);
     const diff = target - now;
     document.getElementById("cd-days").textContent = pad(Math.floor(diff / 864e5));
     document.getElementById("cd-hours").textContent = pad(Math.floor(diff / 36e5) % 24);
