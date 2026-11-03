@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLBB Hero Stats</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f8; }
+        .hero-row {
+            display: grid;
+            grid-template-columns: 2.5rem 3rem 1fr auto;
+            align-items: center;
+            gap: .75rem;
+            width: 100%;
+            text-align: left;
+            border: 0;
+            border-bottom: 1px solid #e9edf1;
+            background: #fff;
+            padding: .65rem 1rem;
+        }
+        .hero-row:hover, .hero-row:focus-visible { background: #f0f7f7; outline: none; }
+        .hero-row:last-child { border-bottom: 0; }
+        .rank { color: #6c757d; font-variant-numeric: tabular-nums; text-align: right; }
+        .thumb { width: 3rem; height: 3rem; object-fit: cover; background: #eef2f6; }
+        .bar { height: 6px; background: #e9edf1; border-radius: 3px; position: relative; margin-top: .35rem; }
+        .bar > span { display: block; height: 100%; border-radius: 3px; background: #1a8f8f; }
+        .bar > i { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: #adb5bd; }
+        .stat { text-align: right; font-variant-numeric: tabular-nums; }
+        .chart { width: 100%; height: auto; display: block; }
+        .chart text { fill: #6c757d; font-size: 11px; }
+        .chart .line { fill: none; stroke: #1a8f8f; stroke-width: 2; stroke-linejoin: round; }
+        .chart .dot { fill: #1a8f8f; }
+        .chart .grid { stroke: #e9edf1; }
+        .chart .ref { stroke: #adb5bd; stroke-dasharray: 4 3; }
+    </style>
+</head>
+<body data-bs-theme="dark">
+<main class="container py-5" style="max-width: 760px;">
+    <header class="card p-5 mb-4">
+        <h1 class="h3 mb-1">TONBITS - MLBB Hero Stats</h1>
+        <p class="text-secondary mb-0">Last 7 days, <span id="rank-label">all ranks</span>. Select a hero to see its performance trends.</p>
+    </header>
+
+    <input id="search" type="search" class="form-control form-control-lg mb-2" placeholder="Search heroes" aria-label="Search heroes" autocomplete="off">
+
+    <div class="row g-2 mb-3">
+        <div class="col-6 col-md">
+            <select id="rank" class="form-select" aria-label="Filter by rank">
+                <option value="all" selected>All ranks</option>
+                <option value="epic">Epic</option>
+                <option value="legend">Legend</option>
+                <option value="mythic">Mythic</option>
+                <option value="honor">Mythic Honor</option>
+                <option value="glory">Mythic Glory</option>
+            </select>
+        </div>
+        <div class="col-6 col-md">
+            <select id="lane" class="form-select" aria-label="Filter by position">
+                <option value="all" selected>All positions</option>
+                <option value="gold">Gold lane</option>
+                <option value="exp">EXP lane</option>
+                <option value="mid">Mid lane</option>
+                <option value="jungle">Jungle</option>
+                <option value="roam">Roam</option>
+            </select>
+        </div>
+        <div class="col-8 col-md">
+            <select id="metric" class="form-select" aria-label="Sort by">
+                <option value="win" selected>Sort by win rate</option>
+                <option value="pick">Sort by pick rate</option>
+                <option value="ban">Sort by ban rate</option>
+            </select>
+        </div>
+        <div class="col-4 col-md-auto">
+            <button id="dir" type="button" class="btn btn-outline-secondary w-100" aria-label="Sort direction: high to low">High → Low</button>
+        </div>
+    </div>
+
+    <div id="status" class="text-secondary small mb-2" role="status">Loading heroes...</div>
+    <div id="list" class="card border-0 shadow-sm overflow-hidden"></div>
+
+    <nav class="mt-4" aria-label="Hero pages">
+        <ul id="pager" class="pagination justify-content-center flex-wrap mb-0"></ul>
+    </nav>
+
+    <footer class="text-center small text-muted mt-5">
+        Powered by Rone Arena API. Game data © Moonton (Mobile Legends). API maintained by ridwaanhall / RoneAI.
+        Unofficial project, not affiliated with Moonton.
+    </footer>
+</main>
+
+<!-- Hero trends -->
+<div class="modal fade" id="hero-modal" tabindex="-1" aria-labelledby="hero-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <img id="hero-img" class="thumb rounded-circle" style="width:4rem;height:4rem" alt="">
+                    <div>
+                        <h2 class="h4 mb-0" id="hero-title"></h2>
+                        <div id="hero-sub" class="text-secondary small"></div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close align-self-start" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Metric" id="trend-metrics">
+                        <button type="button" class="btn btn-outline-primary" data-metric="win">Win rate</button>
+                        <button type="button" class="btn btn-outline-primary" data-metric="pick">Pick rate</button>
+                        <button type="button" class="btn btn-outline-primary" data-metric="ban">Ban rate</button>
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Time window" id="trend-days">
+                        <button type="button" class="btn btn-outline-secondary" data-days="7">7 days</button>
+                        <button type="button" class="btn btn-outline-secondary" data-days="15">15 days</button>
+                        <button type="button" class="btn btn-outline-secondary" data-days="30">30 days</button>
+                    </div>
+                </div>
+                <div id="trend-body" aria-live="polite"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const BASES = ['https://arena.fastapicloud.dev/api', 'https://arena-hv.fastapicloud.dev/api'];
+    const PAGE_SIZE = 10;
+    const METRICS = { win: 'Win rate', pick: 'Pick rate', ban: 'Ban rate' };
+    const TREND_KEYS = { win: 'win_rate', pick: 'app_rate', ban: 'ban_rate' };
+
+    const $ = (id) => document.getElementById(id);
+    const state = { rank: 'all', lane: 'all', metric: 'win', dir: 'desc', page: 1 };
+    const rankCache = new Map();   // rank -> heroes[]
+    const laneCache = new Map();   // lane -> Set(hero ids)
+    const trendCache = new Map();  // "id|rank|days" -> points[]
+    let heroes = [];               // after rank + position filter, sorted
+    let filtered = [];             // after search
+    let loadToken = 0;
+
+    const api = async (path) => {
+        let lastError;
+        for (const base of BASES) {
+            try {
+                const res = await fetch(base + path);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+                if (json.code !== undefined && json.code !== 0) throw new Error(json.message || 'API error');
+                return json;
+            } catch (err) { lastError = err; }
+        }
+        throw lastError;
+    };
+
+    const num = (v) => (v == null ? null : v <= 1 ? v * 100 : v);
+    const pct = (v) => (v == null ? '–' : num(v).toFixed(1) + '%');
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const rankName = () => $('rank').selectedOptions[0].textContent;
+
+    // ---- Data loading ----
+    const fetchAll = async (path, limit = 5) => {
+        let out = [], total = Infinity;
+        for (let index = 1; out.length < total && index <= limit; index++) {
+            const json = await api(`${path}&size=200&index=${index}`);
+            const records = json?.data?.records || [];
+            total = json?.data?.total ?? records.length;
+            out = out.concat(records);
+            if (!records.length) break;
+        }
+        return out;
+    };
+
+    const loadRank = async (rank) => {
+        const records = await fetchAll(`/heroes/rank?days=7&rank=${rank}&sort_field=win_rate`);
+        return records.map((r) => {
+            const d = r.data || {};
+            const hero = d.main_hero?.data || {};
+            return {
+                id: Number(d.main_heroid ?? hero.heroid),
+                name: hero.name || String(d.main_heroid),
+                head: hero.head || hero.squarehead || '',
+                win: d.main_hero_win_rate,
+                pick: d.main_hero_appearance_rate ?? d.main_hero_pick_rate,
+                ban: d.main_hero_ban_rate
+            };
+        });
+    };
+
+    const loadLane = async (lane) => {
+        const records = await fetchAll(`/academy/heroes?lane=${lane}`);
+        return new Set(records.map((r) => Number(r.data?.hero_id ?? r.data?.hero?.data?.heroid ?? r.data?.heroid)).filter(Boolean));
+    };
+
+    const recompute = () => {
+        let base = rankCache.get(state.rank) || [];
+        if (state.lane !== 'all') {
+            const ids = laneCache.get(state.lane);
+            base = base.filter((h) => ids.has(h.id));
+        }
+        const m = state.metric, sign = state.dir === 'desc' ? -1 : 1;
+        heroes = [...base].sort((a, b) => {
+            if (a[m] == null) return 1;
+            if (b[m] == null) return -1;
+            return sign * (a[m] - b[m]);
+        });
+        const q = normalize($('search').value);
+        filtered = q ? heroes.filter((h) => normalize(h.name).includes(q)) : heroes;
+    };
+
+    const refresh = async ({ resetPage = true } = {}) => {
+        const token = ++loadToken;
+        const controls = ['rank', 'lane', 'metric', 'dir'].map($);
+        controls.forEach((c) => (c.disabled = true));
+        $('status').textContent = 'Loading heroes...';
+        try {
+            if (!rankCache.has(state.rank)) rankCache.set(state.rank, await loadRank(state.rank));
+            if (state.lane !== 'all' && !laneCache.has(state.lane)) laneCache.set(state.lane, await loadLane(state.lane));
+            if (token !== loadToken) return;
+            $('rank-label').textContent = state.rank === 'all' ? 'all ranks' : rankName() + ' rank';
+            recompute();
+            if (resetPage) state.page = 1;
+            renderList();
+        } catch (err) {
+            $('status').textContent = 'Could not load heroes: ' + err.message;
+        } finally {
+            if (token === loadToken) controls.forEach((c) => (c.disabled = false));
+        }
+    };
+
+    // ---- List ----
+    const renderList = () => {
+        const start = (state.page - 1) * PAGE_SIZE;
+        const slice = filtered.slice(start, start + PAGE_SIZE);
+        const list = $('list');
+        list.replaceChildren();
+
+        if (!slice.length) {
+            const p = document.createElement('p');
+            p.className = 'p-4 text-center text-secondary mb-0';
+            p.textContent = 'No heroes match these filters.';
+            list.append(p);
+        }
+
+        const m = state.metric;
+        const max = Math.max(...heroes.map((h) => num(h[m]) ?? 0), 1);
+        const others = Object.keys(METRICS).filter((k) => k !== m);
+
+        slice.forEach((h) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'hero-row';
+            btn.innerHTML = `
+                <span class="rank"></span>
+                <img class="thumb rounded-circle" alt="" loading="lazy">
+                <span><strong class="name"></strong><div class="bar"><span></span><i></i></div></span>
+                <span class="stat"><strong class="main"></strong><div class="small text-secondary d-none d-sm-block extra"></div></span>`;
+            btn.querySelector('.rank').textContent = heroes.indexOf(h) + 1;
+            const img = btn.querySelector('img');
+            if (h.head) img.src = h.head; else img.style.visibility = 'hidden';
+            btn.querySelector('.name').textContent = h.name;
+            const fill = btn.querySelector('.bar span');
+            fill.style.width = (m === 'win' ? Math.min(num(h.win) ?? 0, 100) : ((num(h[m]) ?? 0) / max) * 100) + '%';
+            if (m !== 'win') btn.querySelector('.bar i').remove();
+            btn.querySelector('.main').textContent = pct(h[m]);
+            btn.querySelector('.extra').textContent = others.map((k) => `${METRICS[k].split(' ')[0]} ${pct(h[k])}`).join(' · ');
+            btn.addEventListener('click', () => openHero(h));
+            list.append(btn);
+        });
+
+        $('status').textContent = filtered.length
+            ? `Showing ${start + 1}–${start + slice.length} of ${filtered.length} heroes · sorted by ${METRICS[m].toLowerCase()}`
+            : '';
+        renderPager(Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)));
+    };
+
+    const renderPager = (pages) => {
+        const pager = $('pager');
+        pager.replaceChildren();
+        if (pages <= 1) return;
+        const add = (label, target, { active = false, disabled = false, aria } = {}) => {
+            const li = document.createElement('li');
+            li.className = `page-item${active ? ' active' : ''}${disabled ? ' disabled' : ''}`;
+            const a = document.createElement('button');
+            a.type = 'button';
+            a.className = 'page-link';
+            a.textContent = label;
+            if (aria) a.setAttribute('aria-label', aria);
+            if (active) a.setAttribute('aria-current', 'page');
+            if (!disabled && !active) a.addEventListener('click', () => { state.page = target; renderList(); window.scrollTo({ top: 0 }); });
+            li.append(a);
+            pager.append(li);
+        };
+        const p = state.page;
+        add('‹', p - 1, { disabled: p === 1, aria: 'Previous page' });
+        const nums = new Set([1, pages, p - 1, p, p + 1].filter((n) => n >= 1 && n <= pages));
+        let prev = 0;
+        [...nums].sort((a, b) => a - b).forEach((n) => {
+            if (n - prev > 1) add('…', n, { disabled: true });
+            add(String(n), n, { active: n === p });
+            prev = n;
+        });
+        add('›', p + 1, { disabled: p === pages, aria: 'Next page' });
+    };
+
+    // ---- Trends modal ----
+    const modal = new bootstrap.Modal($('hero-modal'));
+    const trend = { hero: null, days: 7, metric: 'win' };
+
+    const loadTrend = async (hero, days) => {
+        const key = `${hero.id}|${state.rank}|${days}`;
+        if (trendCache.has(key)) return trendCache.get(key);
+        const json = await api(`/academy/heroes/${hero.id}/trends?days=${days}&rank=${state.rank}`);
+        const records = json?.data?.records || [];
+        // Several records can exist (match types); use the one with the most daily points
+        const series = records.map((r) => r.data?.win_rate || []).sort((a, b) => b.length - a.length)[0] || [];
+        const points = [...series].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        trendCache.set(key, points);
+        return points;
+    };
+
+    const chartSvg = (points, metric) => {
+        const key = TREND_KEYS[metric];
+        const vals = points.map((p) => num(p[key]));
+        const W = 480, H = 200, L = 40, R = 12, T = 12, B = 28;
+        let lo = Math.min(...vals), hi = Math.max(...vals);
+        if (metric === 'win') { lo = Math.min(lo, 50); hi = Math.max(hi, 50); }
+        const pad = Math.max((hi - lo) * 0.15, 0.5);
+        lo = Math.max(0, lo - pad); hi += pad;
+        const x = (i) => L + (i * (W - L - R)) / Math.max(points.length - 1, 1);
+        const y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+        const path = vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+        const dots = vals.map((v, i) => `<circle class="dot" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3"><title>${esc(points[i].date)}: ${v.toFixed(2)}%</title></circle>`).join('');
+        const ref = metric === 'win' ? `<line class="ref" x1="${L}" x2="${W - R}" y1="${y(50)}" y2="${y(50)}"/><text x="${L - 6}" y="${y(50) + 4}" text-anchor="end">50%</text>` : '';
+        return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${METRICS[metric]} over time">
+            <line class="grid" x1="${L}" x2="${W - R}" y1="${y(hi - pad)}" y2="${y(hi - pad)}"/>
+            <line class="grid" x1="${L}" x2="${W - R}" y1="${y(lo)}" y2="${y(lo)}"/>
+            <text x="${L - 6}" y="${y(hi - pad) + 4}" text-anchor="end">${(hi - pad).toFixed(1)}%</text>
+            <text x="${L - 6}" y="${y(lo) + 4}" text-anchor="end">${lo.toFixed(1)}%</text>
+            ${ref}
+            <path class="line" d="${path}"/>${dots}
+            <text x="${L}" y="${H - 8}">${esc(points[0].date)}</text>
+            <text x="${W - R}" y="${H - 8}" text-anchor="end">${esc(points[points.length - 1].date)}</text>
+        </svg>`;
+    };
+
+    const renderTrend = async () => {
+        const { hero, days, metric } = trend;
+        document.querySelectorAll('#trend-metrics button').forEach((b) => b.classList.toggle('active', b.dataset.metric === metric));
+        document.querySelectorAll('#trend-days button').forEach((b) => b.classList.toggle('active', Number(b.dataset.days) === days));
+        const body = $('trend-body');
+        body.innerHTML = '<p class="text-secondary mb-0">Loading trends...</p>';
+        try {
+            const points = await loadTrend(hero, days);
+            if (trend.hero !== hero || trend.days !== days) return; // user moved on
+            if (points.length < 2) { body.innerHTML = '<p class="text-secondary mb-0">Not enough data for this period.</p>'; return; }
+            const vals = points.map((p) => num(p[TREND_KEYS[metric]]));
+            const change = vals[vals.length - 1] - vals[0];
+            const tile = (label, value) => `<div class="col-6 col-sm-3"><div class="bg-light rounded p-2 text-center"><div class="fw-semibold">${value}</div><div class="small text-secondary">${label}</div></div></div>`;
+            body.innerHTML = chartSvg(points, metric) + `<div class="row g-2 mt-2">
+                ${tile('Latest', vals[vals.length - 1].toFixed(1) + '%')}
+                ${tile('Change', (change >= 0 ? '+' : '') + change.toFixed(1) + ' pts')}
+                ${tile('High', Math.max(...vals).toFixed(1) + '%')}
+                ${tile('Low', Math.min(...vals).toFixed(1) + '%')}
+            </div>`;
+        } catch (err) {
+            body.innerHTML = `<p class="text-danger mb-0">Could not load trends. ${esc(err.message)}</p>`;
+        }
+    };
+
+    const openHero = (h) => {
+        trend.hero = h;
+        trend.metric = state.metric;
+        $('hero-title').textContent = h.name;
+        $('hero-img').src = h.head;
+        $('hero-sub').textContent = `${state.rank === 'all' ? 'All ranks' : rankName() + ' rank'} · now ${pct(h.win)} win, ${pct(h.pick)} pick, ${pct(h.ban)} ban`;
+        modal.show();
+        renderTrend();
+    };
+
+    $('trend-metrics').addEventListener('click', (e) => {
+        const b = e.target.closest('button'); if (!b) return;
+        trend.metric = b.dataset.metric; renderTrend();
+    });
+    $('trend-days').addEventListener('click', (e) => {
+        const b = e.target.closest('button'); if (!b) return;
+        trend.days = Number(b.dataset.days); renderTrend();
+    });
+
+    // ---- Controls ----
+    $('search').addEventListener('input', () => { recompute(); state.page = 1; renderList(); });
+    $('rank').addEventListener('change', (e) => { state.rank = e.target.value; refresh(); });
+    $('lane').addEventListener('change', (e) => { state.lane = e.target.value; refresh(); });
+    $('metric').addEventListener('change', (e) => { state.metric = e.target.value; recompute(); state.page = 1; renderList(); });
+    $('dir').addEventListener('click', (e) => {
+        state.dir = state.dir === 'desc' ? 'asc' : 'desc';
+        e.currentTarget.textContent = state.dir === 'desc' ? 'High → Low' : 'Low → High';
+        e.currentTarget.setAttribute('aria-label', `Sort direction: ${state.dir === 'desc' ? 'high to low' : 'low to high'}`);
+        recompute(); state.page = 1; renderList();
+    });
+
+    refresh();
+</script>
+</body>
+</html>
