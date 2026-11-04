@@ -1,0 +1,27 @@
+        body { background-color: #f4f6f8; }
+        .hero-row {
+            display: grid;
+            grid-template-columns: 2.5rem 3rem 1fr auto;
+            align-items: center;
+            gap: .75rem;
+            width: 100%;
+            text-align: left;
+            border: 0;
+            border-bottom: 1px solid #e9edf1;
+            background: #fff;
+            padding: .65rem 1rem;
+        }
+        .hero-row:hover, .hero-row:focus-visible { background: #f0f7f7; outline: none; }
+        .hero-row:last-child { border-bottom: 0; }
+        .rank { color: #6c757d; font-variant-numeric: tabular-nums; text-align: right; }
+        .thumb { width: 3rem; height: 3rem; object-fit: cover; background: #eef2f6; }
+        .bar { height: 6px; background: #e9edf1; border-radius: 3px; position: relative; margin-top: .35rem; }
+        .bar > span { display: block; height: 100%; border-radius: 3px; background: #1a8f8f; }
+        .bar > i { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: #adb5bd; }
+        .stat { text-align: right; font-variant-numeric: tabular-nums; }
+        .chart { width: 100%; height: auto; display: block; }
+        .chart text { fill: #6c757d; font-size: 11px; }
+        .chart .line { fill: none; stroke: #1a8f8f; stroke-width: 2; stroke-linejoin: round; }
+        .chart .dot { fill: #1a8f8f; }
+        .chart .grid { stroke: #e9edf1; }
+        .chart .ref { stroke: #adb5bd; stroke-dasharray: 4 3; }

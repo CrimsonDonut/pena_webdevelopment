@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>TonBITS - MLBB HERO STATS VIEWER</title>
+</head>
+
+<body data-bs-theme="dark" class="bg-dark text-light">
+    <main class="container py-5" style="max-width: 760px;">
+        <header class="card p-5 mb-4">
+            <h1 class="h3 mb-1">TONBITS - MLBB Hero</h1>
+            <p class="text-secondary mb-0">Last 7 days, <span id="rank-label">all ranks</span>. Select a hero to see its
+                performance trends.</p>
+        </header>
+
+        <input id="search" type="search" class="form-control form-control-lg mb-2" placeholder="Search heroes"
+            aria-label="Search heroes" autocomplete="off">
+
+        <div class="row g-2 mb-3">
+            <div class="col-6 col-md">
+                <select id="rank" class="form-select" aria-label="Filter by rank">
+                    <option value="all" selected>All ranks</option>
+                    <option value="epic">Epic</option>
+                    <option value="legend">Legend</option>
+                    <option value="mythic">Mythic</option>
+                    <option value="honor">Mythical Honor</option>
+                    <option value="glory">Mythical Glory</option>
+                </select>
+            </div>
+            <div class="col-6 col-md">
+                <select id="lane" class="form-select" aria-label="Filter by position">
+                    <option value="all" selected>All positions</option>
+                    <option value="gold">Gold lane</option>
+                    <option value="exp">EXP lane</option>
+                    <option value="mid">Mid lane</option>
+                    <option value="jungle">Jungle</option>
+                    <option value="roam">Roam</option>
+                </select>
+            </div>
+            <div class="col-8 col-md">
+                <select id="metric" class="form-select" aria-label="Sort by">
+                    <option value="win" selected>Sort by win rate</option>
+                    <option value="pick">Sort by pick rate</option>
+                    <option value="ban">Sort by ban rate</option>
+                </select>
+            </div>
+            <div class="col-4 col-md-auto">
+                <button id="dir" type="button" class="btn btn-outline-secondary w-100"
+                    aria-label="Sort direction: high to low">High → Low</button>
+            </div>
+        </div>
+
+        <div id="status" class="text-secondary small mb-2 text-center" role="status">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <div>Loading heroes...</div>
+        </div>
+        <div id="list" class="card border-0 shadow-sm overflow-hidden"></div>
+
+        <nav class="mt-4" aria-label="Hero pages">
+            <ul id="pager" class="pagination justify-content-center flex-wrap mb-0"></ul>
+        </nav>
+
+        <footer class="text-center small text-muted mt-5">
+            Powered by Rone Arena API. Game data © Moonton (Mobile Legends). API maintained by ridwaanhall / RoneAI.
+            Unofficial project, not affiliated with Moonton.
+        </footer>
+    </main>
+</body>
+
+</html>
