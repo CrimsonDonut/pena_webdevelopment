@@ -64,12 +64,48 @@
         <nav class="mt-4" aria-label="Hero pages">
             <ul id="pager" class="pagination justify-content-center flex-wrap mb-0"></ul>
         </nav>
-
+        <div class="modal fade" id="hero-modal" tabindex="-1" aria-labelledby="hero-title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0">
+                    <div class="modal-header border-0 pb-0">
+                        <div class="d-flex align-items-center gap-3">
+                            <img id="hero-img" class="thumb rounded-circle" style="width:4rem;height:4rem" alt="">
+                            <div>
+                                <h2 class="h4 mb-0" id="hero-title"></h2>
+                                <div id="hero-sub" class="text-secondary small"></div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close align-self-start" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Metric" id="trend-metrics">
+                                <button type="button" class="btn btn-outline-primary" data-metric="win">Win
+                                    rate</button>
+                                <button type="button" class="btn btn-outline-primary" data-metric="pick">Pick
+                                    rate</button>
+                                <button type="button" class="btn btn-outline-primary" data-metric="ban">Ban
+                                    rate</button>
+                            </div>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Time window" id="trend-days">
+                                <button type="button" class="btn btn-outline-secondary" data-days="7">7 days</button>
+                                <button type="button" class="btn btn-outline-secondary" data-days="15">15 days</button>
+                                <button type="button" class="btn btn-outline-secondary" data-days="30">30 days</button>
+                            </div>
+                        </div>
+                        <div id="trend-body" aria-live="polite"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <footer class="text-center small text-muted mt-5">
             Powered by Rone Arena API. Game data © Moonton (Mobile Legends). API maintained by ridwaanhall / RoneAI.
             Unofficial project, not affiliated with Moonton.
         </footer>
     </main>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
 
 </html>

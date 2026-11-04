@@ -131,7 +131,7 @@
     const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
     const rankName = () => $('rank').selectedOptions[0].textContent;
 
-    // ---- Data loading ----
+    // Data loading 
     const fetchAll = async (path, limit = 5) => {
         let out = [], total = Infinity;
         for (let index = 1; out.length < total && index <= limit; index++) {
@@ -201,7 +201,7 @@
         }
     };
 
-    // ---- List ----
+    // List 
     const renderList = () => {
         const start = (state.page - 1) * PAGE_SIZE;
         const slice = filtered.slice(start, start + PAGE_SIZE);
@@ -276,7 +276,7 @@
         add('›', p + 1, { disabled: p === pages, aria: 'Next page' });
     };
 
-    // ---- Trends modal ----
+    // Trends modal
     const modal = new bootstrap.Modal($('hero-modal'));
     const trend = { hero: null, days: 7, metric: 'win' };
 
@@ -360,7 +360,7 @@
         trend.days = Number(b.dataset.days); renderTrend();
     });
 
-    // ---- Controls ----
+    // Controls 
     $('search').addEventListener('input', () => { recompute(); state.page = 1; renderList(); });
     $('rank').addEventListener('change', (e) => { state.rank = e.target.value; refresh(); });
     $('lane').addEventListener('change', (e) => { state.lane = e.target.value; refresh(); });
