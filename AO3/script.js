@@ -5,11 +5,11 @@ const TREND_KEYS = { win: 'win_rate', pick: 'app_rate', ban: 'ban_rate' };
 
 const $ = (id) => document.getElementById(id);
 const state = { rank: 'all', lane: 'all', metric: 'win', dir: 'desc', page: 1 };
-const rankCache = new Map();   // rank -> heroes[]
-const laneCache = new Map();   // lane -> Set(hero ids)
-const trendCache = new Map();  // "id|rank|days" -> points[]
-let heroes = [];               // after rank + position filter, sorted
-let filtered = [];             // after search
+const rankCache = new Map();   // Rank cache
+const laneCache = new Map();   // Lane cache
+const trendCache = new Map();  // Trend cache
+let heroes = [];               // Sorted heroes
+let filtered = [];             // Search results
 let loadToken = 0;
 
 const api = async (path) => {
@@ -32,7 +32,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 const rankName = () => $('rank').selectedOptions[0].textContent;
 
-// Data loading 
+// Loading
 const fetchAll = async (path, limit = 5) => {
     let out = [], total = Infinity;
     for (let index = 1; out.length < total && index <= limit; index++) {
@@ -106,13 +106,13 @@ const refresh = async ({ resetPage = true } = {}) => {
     }
 };
 
-// List: theme settings live here, change them freely
+// Display settings
 const UI = {
-    BAN_ALERT: 20,   // ban rate (%) at or above this gets the crimson row + tag
+    BAN_ALERT: 20,   // Ban threshold
     BAN_TAG: 'High ban',
-    WIN_HOT: 53,     // win rate (%) at or above this is crimson
-    WIN_COOL: 49,    // win rate (%) at or above this is cyan; below it is dimmed
-    BAR_SPLIT: 50    // win rate (%) under this gets the pink bar, at or over it the purple bar
+    WIN_HOT: 53,     // High win rate
+    WIN_COOL: 49,    // Moderate win rate
+    BAR_SPLIT: 50    // Bar color threshold
 };
 
 const span = (text, cls = '') => {
@@ -122,7 +122,7 @@ const span = (text, cls = '') => {
     return s;
 };
 
-// Which color class a stat gets: hot (crimson), cool (cyan) or dim (grey)
+// Stat colors
 const toneOf = (h, m) => {
     const v = num(h[m]) ?? 0;
     if (m === 'win') return v >= UI.WIN_HOT ? 'hot' : v >= UI.WIN_COOL ? 'cool' : 'dim';
@@ -130,10 +130,10 @@ const toneOf = (h, m) => {
     return v >= UI.BAN_ALERT ? 'hot' : 'dim';
 };
 
-// Flat bar colors (defined in theme.css): low = pink, high = purple, mid = in between
+// Bar colors
 const barClass = (h, m) => {
     if (m === 'win') return (num(h.win) ?? 0) >= UI.BAR_SPLIT ? 'fill-high' : 'fill-low';
-    return 'fill-mid';   // pick and ban rates
+    return 'fill-mid';
 };
 
 const renderList = () => {
@@ -163,8 +163,10 @@ const renderList = () => {
         btn.innerHTML = `
             <span class="rank-badge" data-f="rank"></span>
             <span class="avatar"><img data-f="img" alt="" loading="lazy"></span>
-            <span class="who"><span class="name" data-f="name"></span><span class="tag" data-f="tag" hidden></span></span>
-            <span class="meter" aria-hidden="true"><span class="meter-fill" data-f="bar"></span></span>
+            <span class="info">
+                <span class="name-line"><span class="name" data-f="name"></span><span class="tag" data-f="tag" hidden></span></span>
+                <span class="meter" aria-hidden="true"><span class="meter-fill" data-f="bar"></span></span>
+            </span>
             <span class="figures"><span class="main mono" data-f="main"></span><span class="extra mono" data-f="extra"></span></span>
             <span class="material-symbols-outlined chev" aria-hidden="true">chevron_right</span>`;
         const f = (name) => btn.querySelector(`[data-f="${name}"]`);
@@ -183,8 +185,7 @@ const renderList = () => {
         f('main').classList.add('tone-' + toneOf(h, m));
 
         const extra = f('extra');
-        others.forEach((k, i) => {
-            if (i) extra.append(' · ');
+        others.forEach((k) => {
             extra.append(span(`${METRICS[k].split(' ')[0]} ${pct(h[k])}`, k === 'ban' && highBan ? 'tone-hot' : ''));
         });
 
@@ -228,7 +229,7 @@ const renderPager = (pages) => {
     add('›', p + 1, { disabled: p === pages, aria: 'Next page' });
 };
 
-// Trends modal
+// Trends
 const modal = new bootstrap.Modal($('hero-modal'));
 const trend = { hero: null, days: 7, metric: 'win' };
 
@@ -237,7 +238,7 @@ const loadTrend = async (hero, days) => {
     if (trendCache.has(key)) return trendCache.get(key);
     const json = await api(`/academy/heroes/${hero.id}/trends?days=${days}&rank=${state.rank}`);
     const records = json?.data?.records || [];
-    // Several records can exist (match types); use the one with the most daily points
+    // Use the longest series.
     const series = records.map((r) => r.data?.win_rate || []).sort((a, b) => b.length - a.length)[0] || [];
     const points = [...series].sort((a, b) => String(a.date).localeCompare(String(b.date)));
     trendCache.set(key, points);
@@ -286,7 +287,7 @@ const renderTrend = async () => {
     body.innerHTML = '<p class="text-body-secondary mb-0">Loading trends...</p>';
     try {
         const points = await loadTrend(hero, days);
-        if (trend.hero !== hero || trend.days !== days) return; // user moved on
+        if (trend.hero !== hero || trend.days !== days) return; // Ignore stale results.
         if (points.length < 2) { body.innerHTML = '<p class="text-body-secondary mb-0">Not enough data for this period.</p>'; return; }
         const vals = points.map((p) => num(p[TREND_KEYS[metric]]));
         const change = vals[vals.length - 1] - vals[0];
@@ -321,7 +322,7 @@ $('trend-days').addEventListener('click', (e) => {
     trend.days = Number(b.dataset.days); renderTrend();
 });
 
-// Controls 
+// Controls
 $('search').addEventListener('input', () => { recompute(); state.page = 1; renderList(); });
 $('rank').addEventListener('change', (e) => { state.rank = e.target.value; refresh(); });
 $('lane').addEventListener('click', (e) => {
