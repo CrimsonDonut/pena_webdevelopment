@@ -86,7 +86,8 @@ const refresh = async ({ resetPage = true } = {}) => {
     const token = ++loadToken;
     const controls = ['rank', 'metric', 'dir'].map($).concat([...document.querySelectorAll('#lane button')]);
     controls.forEach((c) => (c.disabled = true));
-    $('status').textContent = 'Loading heroes...';
+    $('loading').hidden = false;
+    $('status').textContent = '';
     try {
         if (!rankCache.has(state.rank)) rankCache.set(state.rank, await loadRank(state.rank));
         if (state.lane !== 'all' && !laneCache.has(state.lane)) laneCache.set(state.lane, await loadLane(state.lane));
@@ -98,7 +99,10 @@ const refresh = async ({ resetPage = true } = {}) => {
     } catch (err) {
         $('status').textContent = 'Could not load heroes: ' + err.message;
     } finally {
-        if (token === loadToken) controls.forEach((c) => (c.disabled = false));
+        if (token === loadToken) {
+            controls.forEach((c) => (c.disabled = false));
+            $('loading').hidden = true;
+        }
     }
 };
 

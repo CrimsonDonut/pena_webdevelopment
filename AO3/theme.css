@@ -182,7 +182,7 @@ h1, h2, h3, h4 { font-family: var(--nx-font-display); }
 .pagination .page-link:focus-visible { box-shadow: 0 0 0 2px var(--nx-purple); }
 .pagination .page-item.active .page-link { background: var(--nx-purple); color: #fff; font-weight: 700;}
 .pagination .page-item.disabled .page-link { background: transparent; opacity: .4; }
-
+.pagination:empty { display: none; }
 /* Trends modal */
 .modal-backdrop { --bs-backdrop-bg: #000; --bs-backdrop-opacity: .7; }
 .modal-content {
