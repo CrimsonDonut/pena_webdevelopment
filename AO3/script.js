@@ -84,7 +84,7 @@ const recompute = () => {
 
 const refresh = async ({ resetPage = true } = {}) => {
     const token = ++loadToken;
-    const controls = ['rank', 'lane', 'metric', 'dir'].map($);
+    const controls = ['rank', 'metric', 'dir'].map($).concat([...document.querySelectorAll('#lane button')]);
     controls.forEach((c) => (c.disabled = true));
     $('status').textContent = 'Loading heroes...';
     try {
@@ -102,17 +102,36 @@ const refresh = async ({ resetPage = true } = {}) => {
     }
 };
 
-// List 
+// List: theme settings live here, change them freely
 const UI = {
-    row: 'list-group-item list-group-item-action d-flex align-items-center gap-3',
-    rankBadge: 'badge text-bg-secondary',
-    avatar: 'rounded-circle bg-body-secondary',
-    barWinGood: 'bg-success',   // win rate >= 50%
-    barWinBad: 'bg-danger',    // win rate < 50%
-    barOther: 'bg-info',      // pick / ban rate
-    mainStat: 'fw-bold',
-    extraStat: 'small text-body-secondary'
+    BAN_ALERT: 20,   // ban rate (%) at or above this gets the crimson row + tag
+    BAN_TAG: 'High ban',
+    WIN_HOT: 53,     // win rate (%) at or above this is crimson
+    WIN_COOL: 49,    // win rate (%) at or above this is cyan; below it is dimmed
+    BAR_SPLIT: 50    // win rate (%) under this gets the pink bar, at or over it the purple bar
 };
+
+const span = (text, cls = '') => {
+    const s = document.createElement('span');
+    s.className = cls;
+    s.textContent = text;
+    return s;
+};
+
+// Which color class a stat gets: hot (crimson), cool (cyan) or dim (grey)
+const toneOf = (h, m) => {
+    const v = num(h[m]) ?? 0;
+    if (m === 'win') return v >= UI.WIN_HOT ? 'hot' : v >= UI.WIN_COOL ? 'cool' : 'dim';
+    if (m === 'pick') return 'cool';
+    return v >= UI.BAN_ALERT ? 'hot' : 'dim';
+};
+
+// Flat bar colors (defined in theme.css): low = pink, high = purple, mid = in between
+const barClass = (h, m) => {
+    if (m === 'win') return (num(h.win) ?? 0) >= UI.BAR_SPLIT ? 'fill-high' : 'fill-low';
+    return 'fill-mid';   // pick and ban rates
+};
+
 const renderList = () => {
     const start = (state.page - 1) * PAGE_SIZE;
     const slice = filtered.slice(start, start + PAGE_SIZE);
@@ -130,46 +149,45 @@ const renderList = () => {
     const max = Math.max(...heroes.map((h) => num(h[m]) ?? 0), 1);
     const others = Object.keys(METRICS).filter((k) => k !== m);
 
-    const group = document.createElement('div');
-    group.className = 'list-group list-group-flush';
-
     slice.forEach((h) => {
+        const rank = heroes.indexOf(h) + 1;
+        const highBan = (num(h.ban) ?? 0) >= UI.BAN_ALERT;
+
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = UI.row;
+        btn.className = 'hero-row' + (highBan ? ' is-ban' : rank === 1 && state.dir === 'desc' ? ' is-top' : '');
         btn.innerHTML = `
-            <span data-f="rank" class="${UI.rankBadge}"></span>
-            <img data-f="img" class="${UI.avatar}" width="48" height="48" alt="" loading="lazy">
-            <div class="flex-grow-1">
-                <div data-f="name" class="fw-semibold"></div>
-                <div class="progress mt-1" style="height: 6px">
-                    <div data-f="bar" class="progress-bar" role="progressbar"></div>
-                </div>
-            </div>
-            <div class="text-end">
-                <div data-f="main" class="${UI.mainStat}"></div>
-                <div data-f="extra" class="${UI.extraStat} d-none d-sm-block"></div>
-            </div>`;
+            <span class="rank-badge" data-f="rank"></span>
+            <span class="avatar"><img data-f="img" alt="" loading="lazy"></span>
+            <span class="who"><span class="name" data-f="name"></span><span class="tag" data-f="tag" hidden></span></span>
+            <span class="meter" aria-hidden="true"><span class="meter-fill" data-f="bar"></span></span>
+            <span class="figures"><span class="main mono" data-f="main"></span><span class="extra mono" data-f="extra"></span></span>
+            <span class="material-symbols-outlined chev" aria-hidden="true">chevron_right</span>`;
         const f = (name) => btn.querySelector(`[data-f="${name}"]`);
 
-        f('rank').textContent = heroes.indexOf(h) + 1;
+        f('rank').textContent = rank;
         if (h.head) f('img').src = h.head; else f('img').style.visibility = 'hidden';
         f('name').textContent = h.name;
+        if (highBan) { f('tag').hidden = false; f('tag').textContent = UI.BAN_TAG; }
 
         const width = m === 'win' ? Math.min(num(h.win) ?? 0, 100) : ((num(h[m]) ?? 0) / max) * 100;
         const bar = f('bar');
         bar.style.width = width + '%';
-        bar.setAttribute('aria-valuenow', width.toFixed(0));
-        bar.setAttribute('aria-label', METRICS[m]);
-        bar.classList.add(m === 'win' ? (num(h.win) >= 50 ? UI.barWinGood : UI.barWinBad) : UI.barOther);
+        bar.classList.add(barClass(h, m));
 
         f('main').textContent = pct(h[m]);
-        f('extra').textContent = others.map((k) => `${METRICS[k].split(' ')[0]} ${pct(h[k])}`).join(' · ');
+        f('main').classList.add('tone-' + toneOf(h, m));
 
+        const extra = f('extra');
+        others.forEach((k, i) => {
+            if (i) extra.append(' · ');
+            extra.append(span(`${METRICS[k].split(' ')[0]} ${pct(h[k])}`, k === 'ban' && highBan ? 'tone-hot' : ''));
+        });
+
+        btn.setAttribute('aria-label', `${h.name}, ${METRICS[m]} ${pct(h[m])}. Show performance trends`);
         btn.addEventListener('click', () => openHero(h));
-        group.append(btn);
+        list.append(btn);
     });
-    list.append(group);
 
     $('status').textContent = filtered.length
         ? `Showing ${start + 1}–${start + slice.length} of ${filtered.length} heroes · sorted by ${METRICS[m].toLowerCase()}`
@@ -239,7 +257,7 @@ const chartSvg = (points, metric) => {
            <text x="${L - 6}" y="${y(50) + 4}" text-anchor="end">50%</text>`
         : '';
 
-    return `<svg class="w-100 h-auto text-primary" viewBox="0 0 ${W} ${H}" role="img" aria-label="${METRICS[metric]} over time">
+    return `<svg class="w-100 h-auto text-info" viewBox="0 0 ${W} ${H}" role="img" aria-label="${METRICS[metric]} over time">
         <g class="text-body-tertiary" stroke="currentColor">
             <line x1="${L}" x2="${W - R}" y1="${y(hi - pad)}" y2="${y(hi - pad)}"/>
             <line x1="${L}" x2="${W - R}" y1="${y(lo)}" y2="${y(lo)}"/>
@@ -261,14 +279,14 @@ const renderTrend = async () => {
     document.querySelectorAll('#trend-metrics button').forEach((b) => b.classList.toggle('active', b.dataset.metric === metric));
     document.querySelectorAll('#trend-days button').forEach((b) => b.classList.toggle('active', Number(b.dataset.days) === days));
     const body = $('trend-body');
-    body.innerHTML = '<p class="text-secondary mb-0">Loading trends...</p>';
+    body.innerHTML = '<p class="text-body-secondary mb-0">Loading trends...</p>';
     try {
         const points = await loadTrend(hero, days);
         if (trend.hero !== hero || trend.days !== days) return; // user moved on
-        if (points.length < 2) { body.innerHTML = '<p class="text-secondary mb-0">Not enough data for this period.</p>'; return; }
+        if (points.length < 2) { body.innerHTML = '<p class="text-body-secondary mb-0">Not enough data for this period.</p>'; return; }
         const vals = points.map((p) => num(p[TREND_KEYS[metric]]));
         const change = vals[vals.length - 1] - vals[0];
-        const tile = (label, value) => `<div class="col-6 col-sm-3"><div class="bg-light rounded p-2 text-center"><div class="fw-semibold">${value}</div><div class="small text-secondary">${label}</div></div></div>`;
+        const tile = (label, value) => `<div class="col-6 col-sm-3"><div class="stat-tile"><div class="stat-value">${value}</div><div class="stat-label">${label}</div></div></div>`;
         body.innerHTML = chartSvg(points, metric) + `<div class="row g-2 mt-2">
                 ${tile('Latest', vals[vals.length - 1].toFixed(1) + '%')}
                 ${tile('Change', (change >= 0 ? '+' : '') + change.toFixed(1) + ' pts')}
@@ -302,7 +320,13 @@ $('trend-days').addEventListener('click', (e) => {
 // Controls 
 $('search').addEventListener('input', () => { recompute(); state.page = 1; renderList(); });
 $('rank').addEventListener('change', (e) => { state.rank = e.target.value; refresh(); });
-$('lane').addEventListener('change', (e) => { state.lane = e.target.value; refresh(); });
+$('lane').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b || b.dataset.lane === state.lane) return;
+    state.lane = b.dataset.lane;
+    document.querySelectorAll('#lane button').forEach((x) => x.classList.toggle('active', x === b));
+    refresh();
+});
 $('metric').addEventListener('change', (e) => { state.metric = e.target.value; recompute(); state.page = 1; renderList(); });
 $('dir').addEventListener('click', (e) => {
     state.dir = state.dir === 'desc' ? 'asc' : 'desc';
